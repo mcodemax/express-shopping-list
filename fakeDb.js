@@ -1,3 +1,6 @@
-global.items = [{name: 'popsicle', price: 1.45}, {name:'cheerios', price: 3.40}];
+const Item = require('./classes/item');
+// new Item('popsicle', 1.50);
+// new Item('milk', 3.50);
+global.items = [];
 
 module.exports = items;

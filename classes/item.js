@@ -26,12 +26,12 @@ class Item {
     /**finds item in arr and alters the name and or price 
      * returns false if not found
     */
-    static alterItem(name, price){
-        const item = this.findItem(name);
+    static alterItem(oldName, newName, price = null){
+        const item = this.findItem(oldName);
 
         if(item){//if item exists update items arr and return item
-            item.name = name;
-            item.price = price;
+            item.name = newName;
+            if(price) item.price = price;
             return item;
         }else{
             return false;
@@ -49,4 +49,4 @@ class Item {
     }
 }
 
-module.exports = { Item };
+module.exports = Item;
