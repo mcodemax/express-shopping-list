@@ -1,5 +1,6 @@
 const { request } = require("express");
 const express = require("express");
+const ExpressError = require('../expressError');
 const router = new express.Router();
 const Item = require('../classes/item');
 const items = require('../fakeDb')
@@ -21,7 +22,6 @@ router.post('', (req, res, next) => {
         if(!price) throw new ExpressError(`Need a valid price to add`, 400);//err not working
         
         if(name){ //maybe add validation to make sure there's not already an item with the same name in that list, turn this validation into a seperate f()? needs async??
-			console.log('hi in her')
             const item = new Item(name, price);
             return res.send({ added: item }); 
 		}else{
@@ -41,7 +41,7 @@ router.get('/:name', (req, res, next) => {
 	
 	try {
         if(!item){//if item=false
-			throw new ExpressError(`Couldn't find item in list`, 400); //Err code needed, reason err thrown = 'Can't find this item'
+			throw new ExpressError(`Couldn't find item in list`, 404); //Err code needed, reason err thrown = 'Can't find this item'
 		}
     } catch (error) {
         return next(error);
@@ -54,21 +54,20 @@ router.patch('/:name', (req, res, next) => {
 	const oldName = req.params.name;
 
     let newName = req.body.name ? req.body.name : oldName;
-    
-    let price;
-	if(req.body.price) price = Number(req.body.price);
-    
-	//isNaN(null) evals to false
+    let price = req.body.price ? req.body.price : null;
+	
+	if(!isNaN(req.body.price)) price = Number(price);
+
 	try {
         if(Item.findItem(oldName)){//maybe add validation to make sure there's not already an item with the same name in that list, turn this validation into a seperate f()? needs async??
-			
-			if(!price){
+			console.log(price);
+			if(typeof price === 'string'){// if price is NaN
 				throw new ExpressError('Price must be a number.', 400)	 //bug: 500 error returned
 			}
 			const item = Item.alterItem(oldName, newName, price);
             return res.send({ updated: item }); 
 		}else{
-			throw new ExpressError(`Couldn't find item in list`, 400);//500 err return not an express error
+			throw new ExpressError(`Couldn't find item in list`, 404);//500 err return not an express error
 		}
     } catch (error) {
         return next(error);

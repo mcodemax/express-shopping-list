@@ -30,6 +30,4 @@ app.use((err, req, res, next) => { //having 4 args tels express it's an err hand
     })
 });
 
-app.listen(3000, () => { //always have this at END of file, b/c need definied routes b4 you start listening
-    console.log('Server running on port 3000')
-});
+module.exports = app;
