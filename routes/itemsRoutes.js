@@ -5,7 +5,6 @@ const router = new express.Router();
 const Item = require('../classes/item');
 const items = require('../fakeDb')
 
-//might need2coerce stuff inte integers somewhere
 router.get('', (req, res, next) => {    
     try {
         return res.send(items); //.json not needed b/c included in app.py
@@ -19,7 +18,7 @@ router.post('', (req, res, next) => {
 	const price = Number(req.body.price);
 
 	try {
-        if(!price) throw new ExpressError(`Need a valid price to add`, 400);//err not working
+        if(!price) throw new ExpressError(`Need a valid price to add`, 400);
         
         if(name){ //maybe add validation to make sure there's not already an item with the same name in that list, turn this validation into a seperate f()? needs async??
             const item = new Item(name, price);
@@ -37,11 +36,11 @@ router.post('', (req, res, next) => {
 
 router.get('/:name', (req, res, next) => {    
 	const name = req.params.name;
-	const item = Item.findItem(name);//needs validation in case Item.findItem returns false
+	const item = Item.findItem(name);
 	
 	try {
         if(!item){//if item=false
-			throw new ExpressError(`Couldn't find item in list`, 404); //Err code needed, reason err thrown = 'Can't find this item'
+			throw new ExpressError(`Couldn't find item in list`, 404);
 		}
     } catch (error) {
         return next(error);
@@ -59,15 +58,14 @@ router.patch('/:name', (req, res, next) => {
 	if(!isNaN(req.body.price)) price = Number(price);
 
 	try {
-        if(Item.findItem(oldName)){//maybe add validation to make sure there's not already an item with the same name in that list, turn this validation into a seperate f()? needs async??
-			console.log(price);
-			if(typeof price === 'string'){// if price is NaN
-				throw new ExpressError('Price must be a number.', 400)	 //bug: 500 error returned
+        if(Item.findItem(oldName)){//duplicate names allowed
+			if(typeof price === 'string'){
+				throw new ExpressError('Price must be a number.', 400);
 			}
 			const item = Item.alterItem(oldName, newName, price);
             return res.send({ updated: item }); 
 		}else{
-			throw new ExpressError(`Couldn't find item in list`, 404);//500 err return not an express error
+			throw new ExpressError(`Couldn't find item in list`, 404);
 		}
     } catch (error) {
         return next(error);
@@ -82,13 +80,11 @@ router.delete('/:name', (req, res, next) => {
 			Item.deleteItem(name);
             return res.send({ message: "Deleted" }); 
 		}else{
-			throw new ExpressError(`Couldn't find item in list`, 400); //Err code needed, reason err thrown = 'Couldn't find item in list'
+			throw new ExpressError(`Couldn't find item in list`, 400); 
 		}
 	} catch (error) {
 		return next(error);
 	}
 });
-
-
 
 module.exports = router;
